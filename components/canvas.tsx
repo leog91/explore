@@ -6,8 +6,8 @@ const unit = 64;
 const canvasSize = { width: unit * 10, height: unit * 6 };
 
 function Canvas() {
-  const canvas = useRef();
-  const layer2 = useRef();
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const layer2 = useRef<HTMLCanvasElement>(null);
 
   const [gridVisible, setGridVisible] = useState(true);
   const [index, setIndex] = useState(0);
@@ -16,7 +16,13 @@ function Canvas() {
 
   console.log("render main");
 
-  const drawSquare = (ctx, fromX, fromY, toX, toY) => {
+  const drawSquare = (
+    ctx: CanvasRenderingContext2D,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number
+  ) => {
     ctx.strokeStyle = "rgba(0, 0, 0, 1)";
     ctx.strokeRect(fromX, fromY, toX, toY);
   };
@@ -25,7 +31,7 @@ function Canvas() {
   let position = [0, 0];
   let directionForward = [true, true];
 
-  const dvdScreenSaver = (ctx, qty) =>
+  const dvdScreenSaver = (ctx: CanvasRenderingContext2D, qty: number) =>
     Array(qty)
       .fill("e")
       .forEach((e) => {
@@ -58,7 +64,7 @@ function Canvas() {
         }
       });
 
-  const menu = (ctx) => {
+  const menu = (ctx: CanvasRenderingContext2D) => {
     drawSquare(
       ctx,
       0,
@@ -82,7 +88,10 @@ function Canvas() {
   };
 
   const grid = () => {
-    const ctx = layer2.current.getContext("2d");
+    const ctx = layer2.current?.getContext("2d");
+
+    if (!ctx) return;
+
     ctx.strokeStyle = "rgba(182, 167, 23, 0.8)";
     // ctx.beginPath();
 
@@ -104,7 +113,11 @@ function Canvas() {
   const run = () => {
     console.log("run");
     console.log(Math.floor(Math.random() * 100));
-    const context = canvas.current.getContext("2d");
+
+    // if (!canvas.current) return;
+    const context = canvas.current?.getContext("2d");
+
+    if (!context) return;
 
     dvdScreenSaver(context, +qty);
     menu(context);
@@ -112,7 +125,7 @@ function Canvas() {
     //layer2
     grid();
 
-    context.stroke();
+    context?.stroke();
   };
 
   return (
@@ -122,7 +135,7 @@ function Canvas() {
       <input
         className=""
         value={qty}
-        onChange={(e) => setQty(e.target.value)}
+        onChange={(e) => setQty(+e.target.value)}
         min={1}
         max={400}
         type="number"
