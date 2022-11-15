@@ -5,12 +5,21 @@ const unit = 64;
 
 const canvasSize = { width: unit * 10, height: unit * 6 };
 
-function Canvas() {
+function Canvas({
+  setInfo,
+}: {
+  setInfo: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const layer2 = useRef<HTMLCanvasElement>(null);
 
   const [gridVisible, setGridVisible] = useState(true);
   const [index, setIndex] = useState(0);
+
+  const [pos, setPos] = useState({
+    x: canvasSize.width / 2 - unit / 2,
+    y: canvasSize.height / 2 - unit / 2,
+  });
 
   const [qty, setQty] = useState(1);
 
@@ -112,6 +121,7 @@ function Canvas() {
 
   const run = () => {
     console.log("run");
+    setInfo("run!");
     console.log(Math.floor(Math.random() * 100));
 
     // if (!canvas.current) return;
@@ -126,6 +136,40 @@ function Canvas() {
     grid();
 
     context?.stroke();
+  };
+
+  const move = (dir: string) => {
+    const context = canvas.current?.getContext("2d");
+
+    if (!context) return;
+
+    switch (dir) {
+      case "up":
+        drawSquare(context, pos.x, pos.y - unit, unit, unit);
+        setPos((ps) => ({ ...ps, y: ps.y - unit }));
+        break;
+      case "down":
+        drawSquare(context, pos.x, pos.y + unit, unit, unit);
+        setPos((ps) => ({ ...ps, y: ps.y + unit }));
+        break;
+      case "left":
+        drawSquare(context, pos.x - unit, pos.y, unit, unit);
+        setPos((ps) => ({ ...ps, x: ps.x - unit }));
+        break;
+      case "right":
+        drawSquare(context, pos.x + unit, pos.y, unit, unit);
+        setPos((ps) => ({ ...ps, x: ps.x + unit }));
+
+        break;
+      default:
+        console.log("wrong!!");
+        break;
+    }
+
+    //state de-sync
+    // drawSquare(context, pos.x, pos.y, unit, unit);
+
+    setInfo(dir);
   };
 
   return (
@@ -154,6 +198,22 @@ function Canvas() {
         {" "}
         GRID
       </button>
+      <div className="grid grid-cols-3 gap-1 text-center">
+        <button className=" h-8  "></button>
+        <button onClick={() => move("up")} className=" h-8 bg-green-700 ">
+          up
+        </button>
+        <div className=" h-8  "></div>
+        <button onClick={() => move("left")} className=" h-8 bg-green-700 ">
+          left
+        </button>
+        <button onClick={() => move("down")} className=" h-8 bg-green-700 ">
+          down
+        </button>
+        <button onClick={() => move("right")} className=" h-8 bg-green-700 ">
+          right
+        </button>
+      </div>
       canvas
       <div
         style={{ height: `${canvasSize.height}px` }}
